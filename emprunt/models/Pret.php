@@ -63,5 +63,27 @@ public function tableauAmortissement():string
         return $chaine;
 }
 
+public function getTableauAmortissement():array
+{
+$data=array();
+   $partInteret = 0;
+    $partAmortissement = 0;
+    $mensualite =  $this->calculMensualite();
+    $capitalRestant=$this->capital;
+for ($i=0; $i < $this->nbMois ; $i++) { 
+
+    if($i>0)
+    {   $capitalRestant-=$partAmortissement;
+    }
+    $partInteret=$capitalRestant*$this->tauxMensuel;
+    $partAmortissement=$mensualite-$partInteret;
+    array_push($data, ["num_mois"=>$i+1,"partInteret"=>round($partInteret,2),"partAmortissement"=>round($partAmortissement),"capital_restant"=>round($capitalRestant,2),"mensualite"=>round($mensualite) ]);
+}
+
+
+return $data;
+
+}
+
 
 }
