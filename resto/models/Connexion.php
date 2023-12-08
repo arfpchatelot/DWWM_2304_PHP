@@ -22,11 +22,11 @@ class Connexion
 
             try {
                 self::$connection = new PDO(
-                    'mysql:host='.self::$host.';dbname='.self::$base,
+                    'mysql:host=' . self::$host . ';dbname=' . self::$base,
                     self::$user,
                     self::$pass,
                     array(
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_NUM,
+                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
                         PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"
                     )
                 );
@@ -37,7 +37,5 @@ class Connexion
         }
 
         return self::$connection;
-
-
     }
 }
