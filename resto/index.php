@@ -10,13 +10,20 @@
 
 <body>
     <?php
-    require './models/MyTable.php';
+    require './App/model/MyTable.php';
+    require './App/controller/MyTable.php';
+
+    use App\Model\MyTable;
 
     $maTable = new MyTable("restaurants");
 
     $mesDonnees = $maTable->readTable();
     $myData = $maTable->rendreHTML();
     echo $myData;
+
+    $maTable2 = new \App\controller\MyTable("restaurant");
+
+    var_dump($maTable2);
 
     ?>
 
