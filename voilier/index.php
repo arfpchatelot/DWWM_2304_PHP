@@ -29,15 +29,35 @@
 
         if ($nbLigne > 0) {
             $ligne = $state->fetch();
+
+
             if (password_verify($_mdp, $ligne["pass_user"]) == true) {
+
+
                 $_SESSION["nom_utilisateur"] = $ligne["lastname_user"];
                 $loginOK = true;
+            } else {
+                echo "Mot de passe erroné!";
+                $loginOK = false;
             }
         } else {
             $loginOk = false;
+            echo "Identifiant erroné!";
         }
 
         return $loginOK;
+    }
+
+    if (isset($_POST['login'], $_POST['mdp']) && !empty($_POST['login']) && !empty($_POST['mdp'])) {
+        $valid = loginVoilier($_POST['login'], $_POST['mdp']);
+        if ($valid) {
+            echo "<script>window.location.href='liste.php'</script>";
+        } else {
+            echo "Authentification échouée!";
+        }
+    } else {
+        echo "Veuillez remplir toutes les zones du formulaire!";
+        var_export($_POST);
     }
 
 
@@ -52,7 +72,7 @@
 
 
 
-    <form action="<?php $_SERVER['PHP_SELF'];  ?>" method="POST" enctype="multipart/form-data">
+    <form action="index.php" method="POST" enctype="multipart/form-data">
         <fieldset>
             <legend>ACCES MEMBRES</legend>
             <label>Email</label>

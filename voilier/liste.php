@@ -12,6 +12,8 @@
 
 	if (isset($_SESSION["nom_utilisateur"]) && !empty($_SESSION["nom_utilisateur"])) {
 
+		echo "Bonjour M(e) " . $_SESSION['nom_utilisateur'] . ", voici la liste des voiliers disponibles : ";
+
 	?>
 		<ul>
 			<li class="">
