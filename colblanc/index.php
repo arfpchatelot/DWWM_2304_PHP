@@ -65,12 +65,8 @@
       <section>
 
 
-
-
-
-
-
         <h1 style=" text-align:center">formulaire de recherche d'emploi ou stage</h1>
+
         <form name="selection" action="<?php echo $_SERVER["PHP_SELF"] ?>" method="POST" enctype="multipart/form-data">
           <label for="dep">Choisir votre département :</label>
           <select name="dep" id="dep">
@@ -89,15 +85,12 @@
                 echo '<option value="' . $obj->id_dep . '">' . $obj->name . '</option>';
               }
             }
-
-
-
-
             ?>
           </select>
           <br>
           <hr>
           <br>
+
           <fieldset>
             <legend>Sélectionner le type d'établissement</legend>
             <div>
@@ -115,23 +108,65 @@
 
             </div>
             <div>
-              <input type="checkbox" name="choix[]" id="pme" value="PME">
+              <input type="checkbox" name="choix[]" id="pme" value="PME" <?php
+                                                                          if (isset($_POST["choix"])) {
+
+                                                                            foreach ($_POST["choix"] as $key =>  $value) {
+                                                                              if ($value == "PME") {
+                                                                                echo "checked='true'";
+                                                                              }
+                                                                            }
+                                                                          } ?> />
+
               <label for="pme">PME</label>
             </div>
             <div>
-              <input type="checkbox" name="choix[]" id="ge" value="GE">
+              <input type="checkbox" name="choix[]" id="ge" value="GE" <?php
+                                                                        if (isset($_POST["choix"])) {
+
+                                                                          foreach ($_POST["choix"] as $key =>  $value) {
+                                                                            if ($value == "GE") {
+                                                                              echo "checked='true'";
+                                                                            }
+                                                                          }
+                                                                        } ?> />
               <label for="ge">Grande Entreprise</label>
             </div>
             <div>
-              <input type="checkbox" name="choix[]" id="ct" value="CT">
+              <input type="checkbox" name="choix[]" id="ct" value="CT" <?php
+                                                                        if (isset($_POST["choix"])) {
+
+                                                                          foreach ($_POST["choix"] as $key =>  $value) {
+                                                                            if ($value == "CT") {
+                                                                              echo "checked='true'";
+                                                                            }
+                                                                          }
+                                                                        } ?> />
               <label for="ct">Collectivité Territoriale</label>
             </div>
             <div>
-              <input type="checkbox" name="choix[]" id="assoc" value="ASSOC">
+              <input type="checkbox" name="choix[]" id="assoc" value="ASSOC" <?php
+                                                                              if (isset($_POST["choix"])) {
+
+                                                                                foreach ($_POST["choix"] as $key =>  $value) {
+                                                                                  if ($value == "ASSOC") {
+                                                                                    echo "checked='true'";
+                                                                                  }
+                                                                                }
+                                                                              } ?> />
+
               <label for="assoc">Association</label>
             </div>
             <div>
-              <input type="checkbox" name="choix[]" id="autres" value="AUTRES">
+              <input type="checkbox" name="choix[]" id="autres" value="AUTRES" <?php
+                                                                                if (isset($_POST["choix"])) {
+
+                                                                                  foreach ($_POST["choix"] as $key =>  $value) {
+                                                                                    if ($value == "AUTRES") {
+                                                                                      echo "checked='true'";
+                                                                                    }
+                                                                                  }
+                                                                                } ?> />
               <label for="autre">Autres...</label>
             </div>
 
@@ -158,43 +193,52 @@
 
       // var_dump($_POST);
       $finrq = "";
-      if (isset($_POST["choix"]) && count($_POST["choix"]) > 0) {
-        $liste = "";
-        for ($i = 0; $i < count($_POST["choix"]); $i++) {
 
-          $liste .= ",'" . $_POST["choix"][$i] . "'";
+      if (isset($_POST["validation"]) &&  isset($_POST["dep"]) &&  $_POST["dep"] != "") {
+
+
+        if (isset($_POST["choix"]) && count($_POST["choix"]) > 0) {
+          $liste = "";
+          for ($i = 0; $i < count($_POST["choix"]); $i++) {
+
+            $liste .= ",'" . $_POST["choix"][$i] . "'";
+          }
+          $liste = substr($liste, 1);
+
+
+          $finrq = " AND type_etab IN(" . $liste . ")";
         }
-        $liste = substr($liste, 1);
 
 
-        $finrq = " AND type_etab IN(" . $liste . ")";
+
+        $connect = Connexion::getinstance();
+        $rq = "SELECT nom_etab, type_etab, nom_resp, adresse, ville, cp, Telephone, email FROM institutions WHERE depart=:departement " . $finrq;
+        $state = $connect->prepare($rq);
+        $state->bindParam(":departement", $_POST["dep"], PDO::PARAM_STR);
+        $state->execute();
+        $data = [];
+        $nbEntr = 0;
+
+        echo "<caption > Resultats de votre recherche </caption><table class='table table-striped table-hover'>";
+        echo "<thead><tr><th>Nom etablissement</th> <th> type etab</th> <th> Nom resp</th> <th>adresse</th><th>code postal</th><th>ville</th><th>Tél</th><th>mail</th></tr></thead><tbody>";
+
+
+        while ($obj = $state->fetch()) {
+          echo "<tr>";
+          $nbEntr++;
+          array_push($data, $obj);
+          foreach ($obj as $key => $value) {
+            echo '<td> ' . utf8_decode($obj->$key) . '</td>';
+          }
+          echo "</tr>";
+        }
+        //var_dump($data);
+        echo "</tbody></table>";
+      } else {
+
+        echo  " <p>Veuillez selectionner un departement dans le formulaire pour obtenir une reponse à votre recherche </p>";
       }
 
-
-
-      $connect = Connexion::getinstance();
-      $rq = "SELECT nom_etab, type_etab, nom_resp, adresse, ville, cp, Telephone, email FROM institutions WHERE depart=:departement " . $finrq;
-      $state = $connect->prepare($rq);
-      $state->bindParam(":departement", $_POST["dep"], PDO::PARAM_STR);
-      $state->execute();
-      $data = [];
-      $nbEntr = 0;
-
-      echo "<caption > Resultats de votre recherche </caption><table class='table table-striped table-hover'>";
-      echo "<thead><tr><th>Nom etablissement</th> <th> type etab</th> <th> Nom resp</th> <th>adresse</th><th>code postal</th><th>ville</th><th>Tél</th><th>mail</th></tr></thead><tbody>";
-
-
-      while ($obj = $state->fetch()) {
-        echo "<tr>";
-        $nbEntr++;
-        array_push($data, $obj);
-        foreach ($obj as $key => $value) {
-          echo '<td> ' . utf8_decode($obj->$key) . '</td>';
-        }
-        echo "</tr>";
-      }
-      //var_dump($data);
-      echo "</tbody></table>";
 
       ?>
     </main>
