@@ -1,6 +1,6 @@
 <?php
 
-include('src/model.php');
+// include('src/model.php');
 
 function addComment(string $_id, array $_input): void
 {
@@ -14,7 +14,7 @@ function addComment(string $_id, array $_input): void
     }
 
     $success = createComment($_id, $author, $comment);
-    if (!$success) {
+    if ($success != 1) {
         die('Impossible d\'ajouter le commentaire!');
     } else {
         header('Location:index.php?action=post&id=' . $_id);
